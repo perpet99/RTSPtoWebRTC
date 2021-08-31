@@ -3,7 +3,9 @@ add runtime rtsp to webrtc
 
 ex)
 
-http://127.0.0.1:8083/stream/player2?uuid=test&url=rtsp://127.0.0.1:554/video
+http://127.0.0.1:8083/stream/player2?uuid=test&url=rtsp://wowzaec2demo.streamlock.net/vod/mp4:BigBuckBunny_115k.mov
+
+
 
 
 
