@@ -1,3 +1,14 @@
+
+add runtime rtsp to webrtc
+
+ex)
+
+http://127.0.0.1:8083/stream/player2?uuid=test&url=rtsp://127.0.0.1:554/video
+
+
+
+
+
 # RTSPtoWebRTC
 
 RTSP Stream to WebBrowser over WebRTC based on Pion
