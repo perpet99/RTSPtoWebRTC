@@ -23,15 +23,19 @@ func serveHTTP() {
 
 	router := gin.Default()
 	router.Use(CORSMiddleware())
-	
+
 	if _, err := os.Stat("./web"); !os.IsNotExist(err) {
 		router.LoadHTMLGlob("web/templates/*")
 		router.GET("/", HTTPAPIServerIndex)
 		router.GET("/stream/player/:uuid", HTTPAPIServerStreamPlayer)
+		router.GET("/stream/player2", HTTPAPIServerStreamPlayer2)
 	}
 	router.POST("/stream/receiver/:uuid", HTTPAPIServerStreamWebRTC)
 	router.GET("/stream/codec/:uuid", HTTPAPIServerStreamCodec)
 	router.POST("/stream", HTTPAPIServerStreamWebRTC2)
+
+	router.POST("/receiver/:uuid", HTTPAPIServerStreamWebRTC)
+	router.GET("/codec/:uuid", HTTPAPIServerStreamCodec)
 
 	router.StaticFS("/static", http.Dir("web/static"))
 	err := router.Run(Config.Server.HTTPPort)
@@ -62,6 +66,24 @@ func HTTPAPIServerStreamPlayer(c *gin.Context) {
 	c.HTML(http.StatusOK, "player.tmpl", gin.H{
 		"port":     Config.Server.HTTPPort,
 		"suuid":    c.Param("uuid"),
+		"suuidMap": all,
+		"version":  time.Now().String(),
+	})
+}
+
+//HTTPAPIServerStreamPlayer stream player
+func HTTPAPIServerStreamPlayer2(c *gin.Context) {
+
+	var uuid = c.Query("uuid")
+	var url = c.Query("url")
+
+	Config.CheckAdd(uuid, url)
+
+	_, all := Config.list()
+	sort.Strings(all)
+	c.HTML(http.StatusOK, "player.tmpl", gin.H{
+		"port":     Config.Server.HTTPPort,
+		"suuid":    uuid,
 		"suuidMap": all,
 		"version":  time.Now().String(),
 	})
@@ -177,7 +199,7 @@ type Response struct {
 }
 
 type ResponseError struct {
-	Error  string   `json:"error"`
+	Error string `json:"error"`
 }
 
 func HTTPAPIServerStreamWebRTC2(c *gin.Context) {

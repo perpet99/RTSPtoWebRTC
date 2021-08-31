@@ -20,9 +20,9 @@ var Config = loadConfig()
 
 //ConfigST struct
 type ConfigST struct {
-	mutex   sync.RWMutex
-	Server  ServerST            `json:"server"`
-	Streams map[string]StreamST `json:"streams"`
+	mutex     sync.RWMutex
+	Server    ServerST            `json:"server"`
+	Streams   map[string]StreamST `json:"streams"`
 	LastError error
 }
 
@@ -208,6 +208,25 @@ func (element *ConfigST) clAd(suuid string) (string, chan av.Packet) {
 	ch := make(chan av.Packet, 100)
 	element.Streams[suuid].Cl[cuuid] = viewer{c: ch}
 	return cuuid, ch
+}
+
+func (element *ConfigST) CheckAdd(uuid string, url string) {
+
+	if Config.ext(uuid) == false {
+		Config.Add(uuid, url)
+
+		element.RunIFNotRun(uuid)
+
+	}
+}
+
+func (element *ConfigST) Add(uuid string, url string) {
+	var st StreamST
+	st.Cl = make(map[string]viewer)
+	st.URL = url
+	st.OnDemand = true
+	element.Streams[uuid] = st
+
 }
 
 func (element *ConfigST) list() (string, []string) {
